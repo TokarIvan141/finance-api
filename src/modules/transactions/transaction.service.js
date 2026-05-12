@@ -1,4 +1,5 @@
 const transactionRepo = require('./transaction.repository');
+const budgetRepo = require('../budgets/budget.repository');
 const ApiError = require('../../shared/utils/ApiError');
 
 class TransactionService {
@@ -25,6 +26,21 @@ class TransactionService {
     }
 
     async Create(userId, categoryId, amount, type, date, description) {
+        if (type === 'expense') {
+            const budget = await budgetRepo.GetByCategoryId(categoryId, userId);
+
+            if (budget) {
+                const alreadySpent = await transactionRepo.GetTotalSpentThisMonth(userId, categoryId);
+                const totalAfterTransaction = Number(alreadySpent) + Number(amount);
+
+                if (totalAfterTransaction > Number(budget.amountLimit)) {
+                    throw ApiError.BadRequest(
+                        `Budget limit exceeded. You have already spent ${alreadySpent} this month. Adding ${amount} would result in ${totalAfterTransaction}, which exceeds your limit of ${budget.amountLimit}.`
+                    );
+                }
+            }
+        }
+
         const data = { userId, categoryId, amount, type, date: new Date(date) };
         return await transactionRepo.CreateWithDetails(data, description);
     }

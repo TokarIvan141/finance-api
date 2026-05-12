@@ -9,7 +9,7 @@ setupSwagger(app);
 
 app.use(express.json());
 
-app.use('/api/v1', apiRouter);
+app.use('/api/v1/', apiRouter);
 
 app.get('/ping', (req, res) => {
     res.json({ message: 'API is running', timestamp: new Date() });

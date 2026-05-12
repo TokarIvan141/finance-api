@@ -101,6 +101,28 @@ class TransactionRepository {
             })
         };
     }
+
+    async GetTotalSpentThisMonth(userId, categoryId) {
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+        const result = await prisma.transaction.aggregate({
+            where: {
+                userId,
+                categoryId,
+                type: 'expense',
+                deletedAt: null,
+                date: {
+                    gte: startOfMonth,
+                    lte: endOfMonth
+                }
+            },
+            _sum: { amount: true }
+        });
+
+        return result._sum.amount || 0;
+    }
 }
 
 module.exports = new TransactionRepository();
