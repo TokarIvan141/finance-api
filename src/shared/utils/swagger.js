@@ -269,7 +269,41 @@ const swaggerDocument = {
                     }
                 }
             }
+        },
+        '/api/v1/settings': {
+            get: {
+                summary: 'Get current user settings',
+                tags: ['Settings'],
+                responses: {
+                    '200': { description: 'Success' }
+                }
+            }
+        },
+        '/api/v1/settings/theme': {
+            patch: {
+                summary: 'Update UI theme',
+                tags: ['Settings'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['theme'],
+                                properties: {
+                                    theme: { type: 'string', enum: ['light', 'dark'] }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { description: 'Bad Request' }
+                }
+            }
         }
+
     },
 
 };
