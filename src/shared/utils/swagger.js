@@ -176,6 +176,38 @@ const swaggerDocument = {
                 ],
                 responses: { '200': { description: 'Deleted' } }
             }
+        },
+        '/api/v1/categories/{id}/budget': {
+            get: {
+                summary: 'Get budget for category',
+                tags: ['Budgets'],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
+                responses: { '200': { description: 'Success' } }
+            },
+            post: {
+                summary: 'Set budget for category',
+                tags: ['Budgets'],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
+                requestBody: {
+                    content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } }
+                },
+                responses: { '201': { description: 'Created' } }
+            },
+            put: {
+                summary: 'Update budget for category',
+                tags: ['Budgets'],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
+                requestBody: {
+                    content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } }
+                },
+                responses: { '200': { description: 'Updated' } }
+            },
+            delete: {
+                summary: 'Delete budget for category',
+                tags: ['Budgets'],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
+                responses: { '200': { description: 'Deleted' } }
+            }
         }
     }
 };
