@@ -302,9 +302,32 @@ const swaggerDocument = {
                     '400': { description: 'Bad Request' }
                 }
             }
+        },
+        '/api/v1/logs': {
+            get: {
+                summary: 'Get all system logs',
+                tags: ['Logs'],
+                parameters: [
+                    { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+                    { in: 'query', name: 'limit', schema: { type: 'integer', default: 50 } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/users/{userId}/logs': {
+            get: {
+                summary: 'Get logs for specific user',
+                tags: ['Logs'],
+                parameters: [
+                    { in: 'path', name: 'userId', required: true, schema: { type: 'string', format: 'uuid' } },
+                    { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+                    { in: 'query', name: 'limit', schema: { type: 'integer', default: 20 } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
         }
-
     },
+
 
 };
 
