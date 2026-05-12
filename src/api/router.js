@@ -5,6 +5,7 @@ const TransactionController = require('../modules/transactions/transaction.contr
 const BudgetController = require('../modules/budgets/budget.controller');
 const ReportController = require('../modules/reports/report.controller');
 const ExportController = require('../modules/export/export.controller');
+const SettingController = require('../modules/settings/setting.controller');
 
 router.get('/categories', CategoryController.GetAll);
 router.get('/categories/:id', CategoryController.GetById);
@@ -33,5 +34,8 @@ router.get('/reports/trend', ReportController.GetTrend);
 router.get('/reports/budget-utilization', ReportController.GetBudgetUtilization);
 
 router.get('/export/xlsx', ExportController.DownloadExcel);
+
+router.get('/settings', SettingController.GetSettings);
+router.patch('/settings/theme', SettingController.UpdateTheme);
 
 module.exports = router;
