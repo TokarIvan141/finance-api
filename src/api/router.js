@@ -3,6 +3,7 @@ const router = express.Router();
 const CategoryController = require('../modules/categories/category.controller');
 const TransactionController = require('../modules/transactions/transaction.controller');
 const BudgetController = require('../modules/budgets/budget.controller');
+const ReportController = require('../modules/reports/report.controller');
 
 router.get('/categories', CategoryController.GetAll);
 router.get('/categories/:id', CategoryController.GetById);
@@ -24,5 +25,10 @@ router.get('/transactions/:id', TransactionController.GetById);
 router.post('/transactions', TransactionController.Create);
 router.put('/transactions/:id', TransactionController.Update);
 router.delete('/transactions/:id', TransactionController.Delete);
+
+router.get('/reports/summary', ReportController.GetSummary);
+router.get('/reports/by-category', ReportController.GetByCategory);
+router.get('/reports/trend', ReportController.GetTrend);
+router.get('/reports/budget-utilization', ReportController.GetBudgetUtilization);
 
 module.exports = router;

@@ -208,8 +208,51 @@ const swaggerDocument = {
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 responses: { '200': { description: 'Deleted' } }
             }
+        },
+        '/api/v1/reports/summary': {
+            get: {
+                summary: 'Get total income, expense and balance',
+                tags: ['Reports'],
+                parameters: [
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/reports/by-category': {
+            get: {
+                summary: 'Get expenses/incomes grouped by category (for pie chart)',
+                tags: ['Reports'],
+                parameters: [
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'type', schema: { type: 'string', enum: ['income', 'expense'], default: 'expense' } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/reports/trend': {
+            get: {
+                summary: 'Get transactions grouped by date (for line chart)',
+                tags: ['Reports'],
+                parameters: [
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'interval', schema: { type: 'string', enum: ['day', 'month'], default: 'day' } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/reports/budget-utilization': {
+            get: {
+                summary: 'Get current month budget limits vs actual spending',
+                tags: ['Reports'],
+                responses: { '200': { description: 'Success' } }
+            }
         }
-    }
+    },
+
 };
 
 const setupSwagger = (app) => {
