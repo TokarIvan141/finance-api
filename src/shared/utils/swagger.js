@@ -250,6 +250,25 @@ const swaggerDocument = {
                 tags: ['Reports'],
                 responses: { '200': { description: 'Success' } }
             }
+        },
+        '/api/v1/export/xlsx': {
+            get: {
+                summary: 'Export transactions to Excel (.xlsx)',
+                tags: ['Export'],
+                parameters: [
+                    { in: 'query', name: 'type', schema: { type: 'string', enum: ['income', 'expense'] } },
+                    { in: 'query', name: 'categoryId', schema: { type: 'string', format: 'uuid' } },
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'search', schema: { type: 'string' } }
+                ],
+                responses: {
+                    '200': {
+                        description: 'Excel file',
+                        content: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { schema: { type: 'string', format: 'binary' } } }
+                    }
+                }
+            }
         }
     },
 

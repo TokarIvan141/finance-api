@@ -4,8 +4,8 @@ const ApiError = require('../../shared/utils/ApiError');
 class ReportService {
     _getDefaultDates(startDate, endDate) {
         const now = new Date();
-        const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1); // 1 число текущего месяца
-        const end = endDate ? new Date(endDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0);   // последний день текущего месяца
+        const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = endDate ? new Date(endDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
         if (start > end) throw ApiError.BadRequest('startDate cannot be greater than endDate');
         return { start, end };
