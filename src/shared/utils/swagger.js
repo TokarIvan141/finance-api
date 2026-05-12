@@ -81,6 +81,101 @@ const swaggerDocument = {
                 ],
                 responses: { '200': { description: 'Deleted' } }
             }
+        },
+        '/api/v1/categories/{id}/transactions': {
+            get: {
+                summary: 'Get transactions by category with filters',
+                tags: ['Categories', 'Transactions'],
+                parameters: [
+                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } },
+                    { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+                    { in: 'query', name: 'limit', schema: { type: 'integer', default: 20 } },
+                    { in: 'query', name: 'type', schema: { type: 'string', enum: ['income', 'expense'] } },
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
+                    { in: 'query', name: 'search', schema: { type: 'string' } }
+                ],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/transactions': {
+            get: {
+                summary: 'Get all transactions with filters',
+                tags: ['Transactions'],
+                parameters: [
+                    { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
+                    { in: 'query', name: 'limit', schema: { type: 'integer', default: 20 } },
+                    { in: 'query', name: 'type', schema: { type: 'string', enum: ['income', 'expense'] } },
+                    { in: 'query', name: 'categoryId', schema: { type: 'string', format: 'uuid' } },
+                    { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' }, description: 'YYYY-MM-DD' },
+                    { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' }, description: 'YYYY-MM-DD' },
+                    { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search in description' }
+                ],
+                responses: { '200': { description: 'Success' } }
+            },
+            post: {
+                summary: 'Create a new transaction',
+                tags: ['Transactions'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    categoryId: { type: 'string', format: 'uuid' },
+                                    amount: { type: 'number', example: 1500.50 },
+                                    type: { type: 'string', enum: ['income', 'expense'], example: 'expense' },
+                                    date: { type: 'string', format: 'date-time', example: '2026-05-11T12:00:00Z' },
+                                    description: { type: 'string', example: 'Покупка продуктів' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: { '201': { description: 'Created' } }
+            }
+        },
+        '/api/v1/transactions/{id}': {
+            get: {
+                summary: 'Get transaction by ID',
+                tags: ['Transactions'],
+                parameters: [
+                    {in: 'path', name: 'id', required: true, schema: {type: 'string', format: 'uuid'}}
+                ],
+                responses: {'200': {description: 'Success'}}
+            },
+            put: {
+                summary: 'Update transaction',
+                tags: ['Transactions'],
+                parameters: [
+                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
+                ],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                properties: {
+                                    amount: { type: 'number', example: 1600.00 },
+                                    date: { type: 'string', format: 'date-time', example: '2026-05-12T12:00:00Z' },
+                                    description: { type: 'string', example: 'Оновлений опис' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: { '200': { description: 'Updated' } }
+            },
+            delete: {
+                summary: 'Soft delete transaction',
+                tags: ['Transactions'],
+                parameters: [
+                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
+                ],
+                responses: { '200': { description: 'Deleted' } }
+            }
         }
     }
 };
