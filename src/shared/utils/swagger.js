@@ -11,6 +11,72 @@ const swaggerDocument = {
         { url: 'http://localhost:3000', description: 'Local Server' }
     ],
     paths: {
+        '/api/v1/auth/register': {
+            post: {
+                summary: 'Register a new user',
+                tags: ['Auth'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['email', 'password', 'name'],
+                                properties: {
+                                    email: { type: 'string', format: 'email', example: 'user@example.com' },
+                                    password: { type: 'string', format: 'password', example: '123456' },
+                                    name: { type: 'string', example: 'Іван' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/auth/login': {
+            post: {
+                summary: 'Login user',
+                tags: ['Auth'],
+                requestBody: {
+                    required: true,
+                    content: {
+                        'application/json': {
+                            schema: {
+                                type: 'object',
+                                required: ['email', 'password'],
+                                properties: {
+                                    email: { type: 'string', format: 'email', example: 'user@example.com' },
+                                    password: { type: 'string', format: 'password', example: '123456' }
+                                }
+                            }
+                        }
+                    }
+                },
+                responses: { '200': { description: 'Success' } }
+            }
+        },
+        '/api/v1/auth/logout': {
+            post: {
+                summary: 'Logout user',
+                tags: ['Auth'],
+                responses: { '200': { description: 'Logged out successfully' } }
+            }
+        },
+        '/api/v1/auth/refresh': {
+            post: {
+                summary: 'Refresh access token',
+                tags: ['Auth'],
+                responses: { '200': { description: 'Tokens refreshed' } }
+            }
+        },
+        '/api/v1/auth/me': {
+            get: {
+                summary: 'Get current user info',
+                tags: ['Auth'],
+                responses: { '200': { description: 'Success' } }
+            }
+        },
         '/api/v1/categories': {
             get: {
                 summary: 'Get all categories',
@@ -326,9 +392,7 @@ const swaggerDocument = {
                 responses: { '200': { description: 'Success' } }
             }
         }
-    },
-
-
+    }
 };
 
 const setupSwagger = (app) => {

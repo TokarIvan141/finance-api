@@ -3,8 +3,7 @@ const budgetService = require('./budget.service');
 class BudgetController {
     async GetByCategoryId(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const budget = await budgetService.GetByCategoryId(req.params.id, userId);
             res.json(budget);
         } catch (error) {
@@ -14,8 +13,7 @@ class BudgetController {
 
     async Create(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { amountLimit } = req.body;
             const budget = await budgetService.Create(userId, req.params.id, amountLimit);
             res.status(201).json(budget);
@@ -26,8 +24,7 @@ class BudgetController {
 
     async Update(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { amountLimit } = req.body;
             const updated = await budgetService.UpdateByCategory(req.params.id, userId, amountLimit);
             res.json(updated);
@@ -38,8 +35,7 @@ class BudgetController {
 
     async Delete(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const result = await budgetService.DeleteByCategory(req.params.id, userId);
             res.json(result);
         } catch (error) {

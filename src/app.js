@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const setupSwagger = require('./shared/utils/swagger');
 const apiRouter = require('./api/router');
 const errorMiddleware = require('./api/middlewares/error.middleware');
@@ -8,6 +9,7 @@ const app = express();
 setupSwagger(app);
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/v1/', apiRouter);
 
