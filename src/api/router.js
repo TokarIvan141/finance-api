@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+
+const AuthController = require('../modules/auth/auth.controller');
 const CategoryController = require('../modules/categories/category.controller');
 const TransactionController = require('../modules/transactions/transaction.controller');
 const BudgetController = require('../modules/budgets/budget.controller');
@@ -7,7 +9,18 @@ const ReportController = require('../modules/reports/report.controller');
 const ExportController = require('../modules/export/export.controller');
 const SettingController = require('../modules/settings/setting.controller');
 const LogController = require('../modules/logs/log.controller');
+
+const authMiddleware = require('./middlewares/auth.middleware');
 const auditLog = require('./middlewares/audit.middleware');
+
+router.post('/auth/register', AuthController.register);
+router.post('/auth/login', AuthController.login);
+router.post('/auth/refresh', AuthController.refresh);
+router.post('/auth/logout', AuthController.logout);
+
+router.use(authMiddleware);
+
+router.get('/auth/me', AuthController.me);
 
 router.get('/categories', CategoryController.GetAll);
 router.get('/categories/:id', CategoryController.GetById);
@@ -32,7 +45,6 @@ router.get('/reports/summary', ReportController.GetSummary);
 router.get('/reports/by-category', ReportController.GetByCategory);
 router.get('/reports/trend', ReportController.GetTrend);
 router.get('/reports/budget-utilization', ReportController.GetBudgetUtilization);
-
 router.get('/export/xlsx', ExportController.DownloadExcel);
 
 router.get('/settings', SettingController.GetSettings);

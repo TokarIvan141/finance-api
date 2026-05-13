@@ -5,8 +5,7 @@ const auditLog = (actionName) => {
         res.on('finish', async () => {
             if (res.statusCode >= 200 && res.statusCode < 300) {
                 try {
-                    // TODO: [AUTH] Заменить на req.user.id
-                    const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+                    const userId = req.user ? req.user.id : 'anonymous';
 
                     const details = {
                         method: req.method,

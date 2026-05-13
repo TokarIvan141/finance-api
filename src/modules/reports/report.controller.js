@@ -3,8 +3,7 @@ const reportService = require('./report.service');
 class ReportController {
     async GetSummary(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { startDate, endDate } = req.query;
 
             const summary = await reportService.GetSummary(userId, startDate, endDate);
@@ -16,8 +15,7 @@ class ReportController {
 
     async GetByCategory(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { startDate, endDate, type } = req.query;
 
             const data = await reportService.GetByCategory(userId, startDate, endDate, type);
@@ -29,8 +27,7 @@ class ReportController {
 
     async GetTrend(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { startDate, endDate, interval } = req.query;
 
             const data = await reportService.GetTrend(userId, startDate, endDate, interval);
@@ -42,8 +39,7 @@ class ReportController {
 
     async GetBudgetUtilization(req, res, next) {
         try {
-            // TODO: [AUTH] Заменить на req.user.id
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
 
             const data = await reportService.GetBudgetUtilization(userId);
             res.json(data);
