@@ -5,16 +5,55 @@ const swaggerDocument = {
     info: {
         title: 'Finance API',
         version: '1.0.0',
-        description: 'Personal Finance Management API'
+        description: 'Personal Finance Management API. \n\n🔒 **Авторизація:** API використовує JWT токени (через HttpOnly cookies).'
     },
     servers: [
         { url: 'http://localhost:3000', description: 'Local Server' }
     ],
+    tags: [
+        { name: 'Auth', description: 'Управління доступом' },
+        { name: 'Categories', description: 'Категорії' },
+        { name: 'Transactions', description: 'Транзакції' },
+        { name: 'Budgets', description: 'Бюджети' },
+        { name: 'Reports', description: 'Звіти' },
+        { name: 'Export', description: 'Експорт' },
+        { name: 'Settings', description: 'Налаштування' },
+        { name: 'Logs', description: 'Логи' }
+    ],
+    components: {
+        securitySchemes: {
+            cookieAuth: {
+                type: 'apiKey',
+                in: 'cookie',
+                name: 'accessToken',
+                description: 'JWT токен у HttpOnly Cookie'
+            }
+        },
+        schemas: {
+            Error: {
+                type: 'object',
+                properties: { error: { type: 'string', example: 'Помилка' } }
+            }
+        },
+        responses: {
+            UnauthorizedError: {
+                description: 'Не авторизовано',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            },
+            NotFoundError: {
+                description: 'Не знайдено',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            }
+        }
+    },
+    security: [{ cookieAuth: [] }],
+
     paths: {
         '/api/v1/auth/register': {
             post: {
                 summary: 'Register a new user',
                 tags: ['Auth'],
+                security: [],
                 requestBody: {
                     required: true,
                     content: {
@@ -38,6 +77,7 @@ const swaggerDocument = {
             post: {
                 summary: 'Login user',
                 tags: ['Auth'],
+                security: [],
                 requestBody: {
                     required: true,
                     content: {
@@ -113,27 +153,18 @@ const swaggerDocument = {
             get: {
                 summary: 'Get category by ID',
                 tags: ['Categories'],
-                parameters: [
-                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
-                ],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 responses: { '200': { description: 'Success' } }
             },
             put: {
                 summary: 'Update category name',
                 tags: ['Categories'],
-                parameters: [
-                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
-                ],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 requestBody: {
                     required: true,
                     content: {
                         'application/json': {
-                            schema: {
-                                type: 'object',
-                                properties: {
-                                    name: { type: 'string', example: 'Оренда квартири' }
-                                }
-                            }
+                            schema: { type: 'object', properties: { name: { type: 'string', example: 'Оренда квартири' } } }
                         }
                     }
                 },
@@ -142,9 +173,7 @@ const swaggerDocument = {
             delete: {
                 summary: 'Soft delete category',
                 tags: ['Categories'],
-                parameters: [
-                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
-                ],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 responses: { '200': { description: 'Deleted' } }
             }
         },
@@ -206,29 +235,18 @@ const swaggerDocument = {
             get: {
                 summary: 'Get transaction by ID',
                 tags: ['Transactions'],
-                parameters: [
-                    {in: 'path', name: 'id', required: true, schema: {type: 'string', format: 'uuid'}}
-                ],
-                responses: {'200': {description: 'Success'}}
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
+                responses: { '200': { description: 'Success' } }
             },
             put: {
                 summary: 'Update transaction',
                 tags: ['Transactions'],
-                parameters: [
-                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
-                ],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 requestBody: {
                     required: true,
                     content: {
                         'application/json': {
-                            schema: {
-                                type: 'object',
-                                properties: {
-                                    amount: { type: 'number', example: 1600.00 },
-                                    date: { type: 'string', format: 'date-time', example: '2026-05-12T12:00:00Z' },
-                                    description: { type: 'string', example: 'Оновлений опис' }
-                                }
-                            }
+                            schema: { type: 'object', properties: { amount: { type: 'number', example: 1600.00 }, date: { type: 'string', format: 'date-time', example: '2026-05-12T12:00:00Z' }, description: { type: 'string', example: 'Оновлений опис' } } }
                         }
                     }
                 },
@@ -237,9 +255,7 @@ const swaggerDocument = {
             delete: {
                 summary: 'Soft delete transaction',
                 tags: ['Transactions'],
-                parameters: [
-                    { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }
-                ],
+                parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 responses: { '200': { description: 'Deleted' } }
             }
         },
@@ -254,18 +270,14 @@ const swaggerDocument = {
                 summary: 'Set budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                requestBody: {
-                    content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } }
-                },
+                requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } } },
                 responses: { '201': { description: 'Created' } }
             },
             put: {
                 summary: 'Update budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                requestBody: {
-                    content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } }
-                },
+                requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } } },
                 responses: { '200': { description: 'Updated' } }
             },
             delete: {
@@ -340,9 +352,7 @@ const swaggerDocument = {
             get: {
                 summary: 'Get current user settings',
                 tags: ['Settings'],
-                responses: {
-                    '200': { description: 'Success' }
-                }
+                responses: { '200': { description: 'Success' } }
             }
         },
         '/api/v1/settings/theme': {
@@ -351,27 +361,15 @@ const swaggerDocument = {
                 tags: ['Settings'],
                 requestBody: {
                     required: true,
-                    content: {
-                        'application/json': {
-                            schema: {
-                                type: 'object',
-                                required: ['theme'],
-                                properties: {
-                                    theme: { type: 'string', enum: ['light', 'dark'] }
-                                }
-                            }
-                        }
-                    }
+                    content: { 'application/json': { schema: { type: 'object', required: ['theme'], properties: { theme: { type: 'string', enum: ['light', 'dark'] } } } } }
                 },
-                responses: {
-                    '200': { description: 'Success' },
-                    '400': { description: 'Bad Request' }
-                }
+                responses: { '200': { description: 'Success' }, '400': { description: 'Bad Request' } }
             }
         },
         '/api/v1/logs': {
             get: {
                 summary: 'Get all system logs',
+                security: [],
                 tags: ['Logs'],
                 parameters: [
                     { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
@@ -383,6 +381,7 @@ const swaggerDocument = {
         '/api/v1/users/{userId}/logs': {
             get: {
                 summary: 'Get logs for specific user',
+                security: [],
                 tags: ['Logs'],
                 parameters: [
                     { in: 'path', name: 'userId', required: true, schema: { type: 'string', format: 'uuid' } },
