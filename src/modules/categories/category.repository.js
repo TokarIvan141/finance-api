@@ -1,67 +1,67 @@
 const prisma = require('../../shared/database/prisma');
 
 class CategoryRepository {
-    async GetAll(userId, skip, take, search) {
-        const where = {
-            userId: userId,
-            deletedAt: null
-        };
+  async GetAll(userId, skip, take, search) {
+    const where = {
+      userId: userId,
+      deletedAt: null,
+    };
 
-        if (search) {
-            where.name = {
-                contains: search,
-                mode: 'insensitive'
-            };
-        }
-
-        return await prisma.category.findMany({
-            where: where,
-            skip: skip,
-            take: take,
-            orderBy: { createdAt: 'desc' }
-        });
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive',
+      };
     }
 
-    async CountAll(userId, search) {
-        const where = {
-            userId: userId,
-            deletedAt: null
-        };
+    return await prisma.category.findMany({
+      where: where,
+      skip: skip,
+      take: take,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
-        if (search) {
-            where.name = {
-                contains: search,
-                mode: 'insensitive'
-            };
-        }
+  async CountAll(userId, search) {
+    const where = {
+      userId: userId,
+      deletedAt: null,
+    };
 
-        return await prisma.category.count({ where: where });
+    if (search) {
+      where.name = {
+        contains: search,
+        mode: 'insensitive',
+      };
     }
 
-    async GetById(id, userId) {
-        return await prisma.category.findFirst({
-            where: { id: id, userId: userId, deletedAt: null },
-            include: { transactions: true }
-        });
-    }
+    return await prisma.category.count({ where: where });
+  }
 
-    async Create(data) {
-        return await prisma.category.create({ data });
-    }
+  async GetById(id, userId) {
+    return await prisma.category.findFirst({
+      where: { id: id, userId: userId, deletedAt: null },
+      include: { transactions: true },
+    });
+  }
 
-    async Update(id, data) {
-        return await prisma.category.update({
-            where: { id: id },
-            data: data
-        });
-    }
+  async Create(data) {
+    return await prisma.category.create({ data });
+  }
 
-    async SoftDelete(id) {
-        return await prisma.category.update({
-            where: { id: id },
-            data: { deletedAt: new Date() }
-        });
-    }
+  async Update(id, data) {
+    return await prisma.category.update({
+      where: { id: id },
+      data: data,
+    });
+  }
+
+  async SoftDelete(id) {
+    return await prisma.category.update({
+      where: { id: id },
+      data: { deletedAt: new Date() },
+    });
+  }
 }
 
 module.exports = new CategoryRepository();
