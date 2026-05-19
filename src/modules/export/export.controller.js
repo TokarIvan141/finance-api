@@ -3,7 +3,7 @@ const exportService = require('./export.service');
 class ExportController {
     async DownloadExcel(req, res, next) {
         try {
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+            const userId = req.user.id;
             const { type, categoryId, startDate, endDate, search } = req.query;
 
             const buffer = await exportService.ExportToExcel(userId, { type, categoryId, startDate, endDate, search });
