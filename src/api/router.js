@@ -5,8 +5,8 @@ const authRoutes = require('../modules/auth/auth.routes');
 const categoryRoutes = require('../modules/categories/category.routes');
 const budgetRoutes = require('../modules/budgets/budget.routes');
 const transactionRoutes = require('../modules/transactions/transaction.routes');
+const reportRoutes = require('../modules/reports/report.routes');
 
-const ReportController = require('../modules/reports/report.controller');
 const ExportController = require('../modules/export/export.controller');
 const SettingController = require('../modules/settings/setting.controller');
 const LogController = require('../modules/logs/log.controller');
@@ -21,11 +21,8 @@ router.use(authMiddleware);
 router.use('/categories', categoryRoutes);
 router.use('/categories', budgetRoutes);
 router.use('/', transactionRoutes);
+router.use('/reports', reportRoutes);
 
-router.get('/reports/summary', ReportController.GetSummary);
-router.get('/reports/by-category', ReportController.GetByCategory);
-router.get('/reports/trend', ReportController.GetTrend);
-router.get('/reports/budget-utilization', ReportController.GetBudgetUtilization);
 router.get('/export/xlsx', ExportController.DownloadExcel);
 
 router.get('/settings', SettingController.GetSettings);
