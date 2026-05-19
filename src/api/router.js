@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const AuthController = require('../modules/auth/auth.controller');
-const CategoryController = require('../modules/categories/category.controller');
+const authRoutes = require('../modules/auth/auth.routes');
+const categoryRoutes = require('../modules/categories/category.routes');
+
 const TransactionController = require('../modules/transactions/transaction.controller');
 const BudgetController = require('../modules/budgets/budget.controller');
 const ReportController = require('../modules/reports/report.controller');
@@ -13,20 +14,11 @@ const LogController = require('../modules/logs/log.controller');
 const authMiddleware = require('./middlewares/auth.middleware');
 const auditLog = require('./middlewares/audit.middleware');
 
-router.post('/auth/register', AuthController.register);
-router.post('/auth/login', AuthController.login);
-router.post('/auth/refresh', AuthController.refresh);
-router.post('/auth/logout', AuthController.logout);
+router.use('/auth', authRoutes);
 
 router.use(authMiddleware);
 
-router.get('/auth/me', AuthController.me);
-
-router.get('/categories', CategoryController.GetAll);
-router.get('/categories/:id', CategoryController.GetById);
-router.post('/categories', auditLog('CREATE_CATEGORY'), CategoryController.Create);
-router.put('/categories/:id', auditLog('UPDATE_CATEGORY'), CategoryController.Update);
-router.delete('/categories/:id', auditLog('DELETE_CATEGORY'), CategoryController.Delete);
+router.use('/categories', categoryRoutes);
 
 router.get('/categories/:id/budget', BudgetController.GetByCategoryId);
 router.post('/categories/:id/budget', auditLog('CREATE_BUDGET'), BudgetController.Create);
