@@ -1,47 +1,32 @@
 const budgetService = require('./budget.service');
+const catchAsync = require('../../shared/utils/catchAsync');
 
 class BudgetController {
-    async GetByCategoryId(req, res, next) {
-        try {
-            const userId = req.user.id;
-            const budget = await budgetService.GetByCategoryId(req.params.id, userId);
-            res.json(budget);
-        } catch (error) {
-            next(error);
-        }
-    }
+    GetByCategoryId = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const budget = await budgetService.GetByCategoryId(req.params.id, userId);
+        return res.json(budget);
+    });
 
-    async Create(req, res, next) {
-        try {
-            const userId = req.user.id;
-            const { amountLimit } = req.body;
-            const budget = await budgetService.Create(userId, req.params.id, amountLimit);
-            res.status(201).json(budget);
-        } catch (error) {
-            next(error);
-        }
-    }
+    Create = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const { amountLimit } = req.body;
+        const budget = await budgetService.Create(userId, req.params.id, amountLimit);
+        return res.status(201).json(budget);
+    });
 
-    async Update(req, res, next) {
-        try {
-            const userId = req.user.id;
-            const { amountLimit } = req.body;
-            const updated = await budgetService.UpdateByCategory(req.params.id, userId, amountLimit);
-            res.json(updated);
-        } catch (error) {
-            next(error);
-        }
-    }
+    Update = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const { amountLimit } = req.body;
+        const updated = await budgetService.UpdateByCategory(req.params.id, userId, amountLimit);
+        return res.json(updated);
+    });
 
-    async Delete(req, res, next) {
-        try {
-            const userId = req.user.id;
-            const result = await budgetService.DeleteByCategory(req.params.id, userId);
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
-    }
+    Delete = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const result = await budgetService.DeleteByCategory(req.params.id, userId);
+        return res.json(result);
+    });
 }
 
 module.exports = new BudgetController();
