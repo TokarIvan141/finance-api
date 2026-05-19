@@ -14,8 +14,6 @@ class AuthService {
         const user = await authRepository.createUser(email, hashPassword, name);
 
         const tokens = this.generateTokens({ id: user.id, email: user.email });
-        await authRepository.saveToken(user.id, tokens.refreshToken);
-
         return {
             ...tokens,
             user: { id: user.id, email: user.email, name: user.name }
@@ -34,8 +32,6 @@ class AuthService {
         }
 
         const tokens = this.generateTokens({ id: user.id, email: user.email });
-        await authRepository.saveToken(user.id, tokens.refreshToken);
-
         return {
             ...tokens,
             user: { id: user.id, email: user.email, name: user.name }
@@ -48,9 +44,7 @@ class AuthService {
         }
 
         const userData = this.validateRefreshToken(refreshToken);
-        const tokenFromDb = await authRepository.findToken(refreshToken);
-
-        if (!userData || !tokenFromDb) {
+        if (!userData) {
             throw ApiError.Unauthorized('Сесія застаріла або недійсна');
         }
 
@@ -60,8 +54,6 @@ class AuthService {
         }
 
         const tokens = this.generateTokens({ id: user.id, email: user.email });
-        await authRepository.saveToken(user.id, tokens.refreshToken);
-
         return {
             ...tokens,
             user: { id: user.id, email: user.email, name: user.name }
