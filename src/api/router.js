@@ -6,8 +6,8 @@ const categoryRoutes = require('../modules/categories/category.routes');
 const budgetRoutes = require('../modules/budgets/budget.routes');
 const transactionRoutes = require('../modules/transactions/transaction.routes');
 const reportRoutes = require('../modules/reports/report.routes');
+const exportRoutes = require('../modules/export/export.routes');
 
-const ExportController = require('../modules/export/export.controller');
 const SettingController = require('../modules/settings/setting.controller');
 const LogController = require('../modules/logs/log.controller');
 
@@ -22,8 +22,7 @@ router.use('/categories', categoryRoutes);
 router.use('/categories', budgetRoutes);
 router.use('/', transactionRoutes);
 router.use('/reports', reportRoutes);
-
-router.get('/export/xlsx', ExportController.DownloadExcel);
+router.use('/export', exportRoutes);
 
 router.get('/settings', SettingController.GetSettings);
 router.patch('/settings/theme', auditLog('UPDATE_THEME'), SettingController.UpdateTheme);
