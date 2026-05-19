@@ -1,67 +1,42 @@
 const categoryService = require('./category.service');
+const catchAsync = require('../../shared/utils/catchAsync');
 
 class CategoryController {
-    async GetAll(req, res, next) {
-        try {
-            const userId = req.user.id;
+    GetAll = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const { page = 1, limit = 20, search } = req.query;
+        const result = await categoryService.GetAll(userId, page, limit, search);
+        return res.json(result);
+    });
 
-            const { page = 1, limit = 20, search } = req.query;
-            const result = await categoryService.GetAll(userId, page, limit, search);
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
-    }
+    GetById = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const categoryId = req.params.id;
+        const category = await categoryService.GetById(categoryId, userId);
+        return res.json(category);
+    });
 
-    async GetById(req, res, next) {
-        try {
-            const userId = req.user.id;
+    Create = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const { name, type, color } = req.body;
+        const category = await categoryService.Create(userId, name, type, color);
+        return res.status(201).json(category);
+    });
 
-            const categoryId = req.params.id;
-            const category = await categoryService.GetById(categoryId, userId);
-            res.json(category);
-        } catch (error) {
-            next(error);
-        }
-    }
+    Update = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const categoryId = req.params.id;
+        const { name } = req.body;
+        const updatedCategory = await categoryService.Update(categoryId, userId, name);
+        return res.json(updatedCategory);
+    });
 
-    async Create(req, res, next) {
-        try {
-            const userId = req.user.id;
-
-            const { name, type, color } = req.body;
-            const category = await categoryService.Create(userId, name, type, color);
-            res.status(201).json(category);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async Update(req, res, next) {
-        try {
-            const userId = req.user.id;
-
-            const categoryId = req.params.id;
-            const { name } = req.body;
-
-            const updatedCategory = await categoryService.Update(categoryId, userId, name);
-            res.json(updatedCategory);
-        } catch (error) {
-            next(error);
-        }
-    }
-
-    async Delete(req, res, next) {
-        try {
-            const userId = req.user.id;
-
-            const categoryId = req.params.id;
-            const result = await categoryService.Delete(categoryId, userId);
-            res.json(result);
-        } catch (error) {
-            next(error);
-        }
-    }
+    Delete = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const categoryId = req.params.id;
+        const result = await categoryService.Delete(categoryId, userId);
+        return res.json(result);
+    });
 }
 
 module.exports = new CategoryController();

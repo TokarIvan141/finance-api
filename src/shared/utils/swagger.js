@@ -32,16 +32,31 @@ const swaggerDocument = {
         schemas: {
             Error: {
                 type: 'object',
-                properties: { error: { type: 'string', example: 'Помилка' } }
+                properties: {
+                    success: { type: 'boolean', example: false },
+                    message: { type: 'string', example: 'Опис виниклої помилки або невалідності даних' }
+                }
             }
         },
         responses: {
+            BadRequestError: {
+                description: 'Некоректний запит (помилка валідації, невірні типи даних, порушення унікальності Prisma)',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            },
             UnauthorizedError: {
-                description: 'Не авторизовано',
+                description: 'Не авторизовано (відсутній або застарілий токен доступу)',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            },
+            ForbiddenError: {
+                description: 'Доступ заборонено (немає прав до цього ресурсу)',
                 content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
             },
             NotFoundError: {
-                description: 'Не знайдено',
+                description: 'Ресурс не знайдено в базі даних',
+                content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
+            },
+            InternalServerError: {
+                description: 'Внутрішня помилка сервера (непередбачуване виключення)',
                 content: { 'application/json': { schema: { $ref: '#/components/schemas/Error' } } }
             }
         }
@@ -63,14 +78,17 @@ const swaggerDocument = {
                                 required: ['email', 'password', 'name'],
                                 properties: {
                                     email: { type: 'string', format: 'email', example: 'user@example.com' },
-                                    password: { type: 'string', format: 'password', example: '123456' },
+                                    password: { type: 'string', format: 'password', example: 'Password123' },
                                     name: { type: 'string', example: 'Іван' }
                                 }
                             }
                         }
                     }
                 },
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/auth/login': {
@@ -87,13 +105,16 @@ const swaggerDocument = {
                                 required: ['email', 'password'],
                                 properties: {
                                     email: { type: 'string', format: 'email', example: 'user@example.com' },
-                                    password: { type: 'string', format: 'password', example: '123456' }
+                                    password: { type: 'string', format: 'password', example: 'Password123' }
                                 }
                             }
                         }
                     }
                 },
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/auth/logout': {
@@ -107,14 +128,20 @@ const swaggerDocument = {
             post: {
                 summary: 'Refresh access token',
                 tags: ['Auth'],
-                responses: { '200': { description: 'Tokens refreshed' } }
+                responses: {
+                    '200': { description: 'Tokens refreshed' },
+                    '401': { $ref: '#/components/responses/UnauthorizedError' }
+                }
             }
         },
         '/api/v1/auth/me': {
             get: {
                 summary: 'Get current user info',
                 tags: ['Auth'],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             }
         },
         '/api/v1/categories': {
@@ -126,7 +153,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'limit', schema: { type: 'integer', default: 20 } },
                     { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search by category name' }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '401': { $ref: '#/components/responses/UnauthorizedError' }
+                }
             },
             post: {
                 summary: 'Create a new category',
@@ -146,7 +176,10 @@ const swaggerDocument = {
                         }
                     }
                 },
-                responses: { '201': { description: 'Created' } }
+                responses: {
+                    '201': { description: 'Created' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/categories/{id}': {
@@ -154,7 +187,10 @@ const swaggerDocument = {
                 summary: 'Get category by ID',
                 tags: ['Categories'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             put: {
                 summary: 'Update category name',
@@ -168,13 +204,20 @@ const swaggerDocument = {
                         }
                     }
                 },
-                responses: { '200': { description: 'Updated' } }
+                responses: {
+                    '200': { description: 'Updated' },
+                    '400': { $ref: '#/components/responses/BadRequestError' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             delete: {
                 summary: 'Soft delete category',
                 tags: ['Categories'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Deleted' } }
+                responses: {
+                    '200': { description: 'Deleted' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             }
         },
         '/api/v1/categories/{id}/transactions': {
@@ -190,7 +233,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
                     { in: 'query', name: 'search', schema: { type: 'string' } }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/transactions': {
@@ -206,7 +252,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' }, description: 'YYYY-MM-DD' },
                     { in: 'query', name: 'search', schema: { type: 'string' }, description: 'Search in description' }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             },
             post: {
                 summary: 'Create a new transaction',
@@ -228,7 +277,10 @@ const swaggerDocument = {
                         }
                     }
                 },
-                responses: { '201': { description: 'Created' } }
+                responses: {
+                    '201': { description: 'Created' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/transactions/{id}': {
@@ -236,7 +288,10 @@ const swaggerDocument = {
                 summary: 'Get transaction by ID',
                 tags: ['Transactions'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             put: {
                 summary: 'Update transaction',
@@ -250,13 +305,20 @@ const swaggerDocument = {
                         }
                     }
                 },
-                responses: { '200': { description: 'Updated' } }
+                responses: {
+                    '200': { description: 'Updated' },
+                    '400': { $ref: '#/components/responses/BadRequestError' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             delete: {
                 summary: 'Soft delete transaction',
                 tags: ['Transactions'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Deleted' } }
+                responses: {
+                    '200': { description: 'Deleted' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             }
         },
         '/api/v1/categories/{id}/budget': {
@@ -264,27 +326,40 @@ const swaggerDocument = {
                 summary: 'Get budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             post: {
                 summary: 'Set budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } } },
-                responses: { '201': { description: 'Created' } }
+                responses: {
+                    '201': { description: 'Created' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             },
             put: {
                 summary: 'Update budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
                 requestBody: { content: { 'application/json': { schema: { type: 'object', properties: { amountLimit: { type: 'number' } } } } } },
-                responses: { '200': { description: 'Updated' } }
+                responses: {
+                    '200': { description: 'Updated' },
+                    '400': { $ref: '#/components/responses/BadRequestError' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             },
             delete: {
                 summary: 'Delete budget for category',
                 tags: ['Budgets'],
                 parameters: [{ in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } }],
-                responses: { '200': { description: 'Deleted' } }
+                responses: {
+                    '200': { description: 'Deleted' },
+                    '404': { $ref: '#/components/responses/NotFoundError' }
+                }
             }
         },
         '/api/v1/reports/summary': {
@@ -295,7 +370,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'startDate', schema: { type: 'string', format: 'date' } },
                     { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/reports/by-category': {
@@ -307,7 +385,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
                     { in: 'query', name: 'type', schema: { type: 'string', enum: ['income', 'expense'], default: 'expense' } }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/reports/trend': {
@@ -319,7 +400,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'endDate', schema: { type: 'string', format: 'date' } },
                     { in: 'query', name: 'interval', schema: { type: 'string', enum: ['day', 'month'], default: 'day' } }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/reports/budget-utilization': {
@@ -344,7 +428,8 @@ const swaggerDocument = {
                     '200': {
                         description: 'Excel file',
                         content: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': { schema: { type: 'string', format: 'binary' } } }
-                    }
+                    },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
                 }
             }
         },
@@ -363,7 +448,10 @@ const swaggerDocument = {
                     required: true,
                     content: { 'application/json': { schema: { type: 'object', required: ['theme'], properties: { theme: { type: 'string', enum: ['light', 'dark'] } } } } }
                 },
-                responses: { '200': { description: 'Success' }, '400': { description: 'Bad Request' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         },
         '/api/v1/logs': {
@@ -388,7 +476,10 @@ const swaggerDocument = {
                     { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
                     { in: 'query', name: 'limit', schema: { type: 'integer', default: 20 } }
                 ],
-                responses: { '200': { description: 'Success' } }
+                responses: {
+                    '200': { description: 'Success' },
+                    '400': { $ref: '#/components/responses/BadRequestError' }
+                }
             }
         }
     }

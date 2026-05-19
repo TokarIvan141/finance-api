@@ -20,7 +20,7 @@ async function main() {
     await prisma.user.deleteMany();
     console.log('Базу даних очищено!');
 
-    const hashedPassword = await bcrypt.hash('password123', 10);
+    const hashedPassword = await bcrypt.hash('Password123', 10);
 
     const user1 = await prisma.user.create({
         data: {

@@ -1,26 +1,19 @@
 const settingService = require('./setting.service');
+const catchAsync = require('../../shared/utils/catchAsync');
 
 class SettingController {
-    async GetSettings(req, res, next) {
-        try {
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
-            const settings = await settingService.GetSettings(userId);
-            res.json(settings);
-        } catch (error) {
-            next(error);
-        }
-    }
+    GetSettings = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const settings = await settingService.GetSettings(userId);
+        return res.json(settings);
+    });
 
-    async UpdateTheme(req, res, next) {
-        try {
-            const userId = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
-            const { theme } = req.body;
-            const settings = await settingService.UpdateTheme(userId, theme);
-            res.json(settings);
-        } catch (error) {
-            next(error);
-        }
-    }
+    UpdateTheme = catchAsync(async (req, res, next) => {
+        const userId = req.user.id;
+        const { theme } = req.body;
+        const settings = await settingService.UpdateTheme(userId, theme);
+        return res.json(settings);
+    });
 }
 
 module.exports = new SettingController();

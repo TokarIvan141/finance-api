@@ -10,8 +10,7 @@ const exportRoutes = require('../modules/export/export.routes');
 const settingRoutes = require('../modules/settings/setting.routes');
 const logRoutes = require('../modules/logs/log.routes');
 
-const authMiddleware = require('./middlewares/auth.middleware');
-
+const authMiddleware = require('../../src/api/middlewares/auth.middleware');
 router.use('/auth', authRoutes);
 
 router.use(authMiddleware);
