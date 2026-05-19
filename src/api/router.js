@@ -3,9 +3,9 @@ const router = express.Router();
 
 const authRoutes = require('../modules/auth/auth.routes');
 const categoryRoutes = require('../modules/categories/category.routes');
+const budgetRoutes = require('../modules/budgets/budget.routes');
+const transactionRoutes = require('../modules/transactions/transaction.routes');
 
-const TransactionController = require('../modules/transactions/transaction.controller');
-const BudgetController = require('../modules/budgets/budget.controller');
 const ReportController = require('../modules/reports/report.controller');
 const ExportController = require('../modules/export/export.controller');
 const SettingController = require('../modules/settings/setting.controller');
@@ -19,19 +19,8 @@ router.use('/auth', authRoutes);
 router.use(authMiddleware);
 
 router.use('/categories', categoryRoutes);
-
-router.get('/categories/:id/budget', BudgetController.GetByCategoryId);
-router.post('/categories/:id/budget', auditLog('CREATE_BUDGET'), BudgetController.Create);
-router.put('/categories/:id/budget', auditLog('UPDATE_BUDGET'), BudgetController.Update);
-router.delete('/categories/:id/budget', auditLog('DELETE_BUDGET'), BudgetController.Delete);
-
-router.get('/categories/:id/transactions', TransactionController.GetByCategory);
-
-router.get('/transactions', TransactionController.GetAll);
-router.get('/transactions/:id', TransactionController.GetById);
-router.post('/transactions', auditLog('CREATE_TRANSACTION'), TransactionController.Create);
-router.put('/transactions/:id', auditLog('UPDATE_TRANSACTION'), TransactionController.Update);
-router.delete('/transactions/:id', auditLog('DELETE_TRANSACTION'), TransactionController.Delete);
+router.use('/categories', budgetRoutes);
+router.use('/', transactionRoutes);
 
 router.get('/reports/summary', ReportController.GetSummary);
 router.get('/reports/by-category', ReportController.GetByCategory);
