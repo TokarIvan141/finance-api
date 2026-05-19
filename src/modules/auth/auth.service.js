@@ -1,25 +1,23 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const prisma = require('../../shared/database/prisma');
+const authRepository = require('./auth.repository');
 const ApiError = require('../../shared/utils/ApiError');
 
 class AuthService {
     async register(email, password, name) {
-        const candidate = await prisma.user.findUnique({ where: { email } });
+        const candidate = await authRepository.findByEmail(email);
         if (candidate) {
             throw ApiError.BadRequest(`User with email ${email} already exists`);
         }
         const hashPassword = await bcrypt.hash(password, 3);
-        const user = await prisma.user.create({
-            data: { email, password: hashPassword, name }
-        });
+        const user = await authRepository.create({ email, password: hashPassword, name });
 
         const tokens = this.generateTokens({ id: user.id, email: user.email });
         return { ...tokens, user: { id: user.id, email: user.email, name: user.name } };
     }
 
     async login(email, password) {
-        const user = await prisma.user.findUnique({ where: { email } });
+        const user = await authRepository.findByEmail(email);
         if (!user) {
             throw ApiError.BadRequest('User with this email not found');
         }
@@ -41,7 +39,7 @@ class AuthService {
             throw ApiError.Unauthorized();
         }
 
-        const user = await prisma.user.findUnique({ where: { id: userData.id } });
+        const user = await authRepository.findById(userData.id);
         if (!user) {
             throw ApiError.Unauthorized();
         }
@@ -51,7 +49,7 @@ class AuthService {
     }
 
     async getUserData(userId) {
-        const user = await prisma.user.findUnique({ where: { id: userId } });
+        const user = await authRepository.findById(userId);
         if (!user) {
             throw ApiError.NotFound('User not found');
         }
