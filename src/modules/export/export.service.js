@@ -1,9 +1,29 @@
 const transactionRepo = require('../transactions/transaction.repository');
 const ExcelJS = require('exceljs');
+const ApiError = require('../../shared/utils/ApiError');
 
 class ExportService {
   async ExportToExcel(userId, filters) {
     const transactions = await transactionRepo.GetAll(userId, 0, 100000, filters);
+
+    if (!transactions || transactions.length === 0) {
+      const hasActiveFilters =
+        filters &&
+        (filters.type ||
+          filters.categoryId ||
+          filters.startDate ||
+          filters.endDate ||
+          filters.search);
+
+      if (hasActiveFilters) {
+        throw ApiError.NotFound(
+          'За вказаними фільтрами транзакцій не знайдено. Спробуйте змінити параметри пошуку'
+        );
+      } else {
+        throw ApiError.NotFound('У вашому профілі ще немає жодної транзакції для формування звіту');
+      }
+    }
+
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Фінансовий звіт');
 
@@ -40,8 +60,13 @@ class ExportService {
     });
 
     transactions.forEach((t) => {
+      const formattedDate =
+        t.date instanceof Date
+          ? t.date.toISOString().split('T')[0]
+          : new Date(t.date).toISOString().split('T')[0];
+
       const row = worksheet.addRow({
-        date: t.date.toISOString().split('T')[0],
+        date: formattedDate,
         category: t.category ? t.category.name : 'Немає категорії',
         type: t.type === 'income' ? 'Дохід' : 'Витрата',
         amount: Number(t.amount),

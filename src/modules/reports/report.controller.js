@@ -1,52 +1,33 @@
 const reportService = require('./report.service');
+const catchAsync = require('../../shared/utils/catchAsync');
 
 class ReportController {
-  async GetSummary(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { startDate, endDate } = req.query;
+  GetSummary = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const { startDate, endDate } = req.query;
+    const summary = await reportService.GetSummary(userId, startDate, endDate);
+    return res.json(summary);
+  });
 
-      const summary = await reportService.GetSummary(userId, startDate, endDate);
-      res.json(summary);
-    } catch (error) {
-      next(error);
-    }
-  }
+  GetByCategory = catchAsync(async (req, res) => {
+    const userId = req.user.id;
+    const { startDate, endDate, type } = req.query;
+    const data = await reportService.GetByCategory(userId, startDate, endDate, type);
+    return res.json(data);
+  });
 
-  async GetByCategory(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { startDate, endDate, type } = req.query;
+  GetTrend = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const { startDate, endDate, interval } = req.query;
+    const data = await reportService.GetTrend(userId, startDate, endDate, interval);
+    return res.json(data);
+  });
 
-      const data = await reportService.GetByCategory(userId, startDate, endDate, type);
-      res.json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async GetTrend(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { startDate, endDate, interval } = req.query;
-
-      const data = await reportService.GetTrend(userId, startDate, endDate, interval);
-      res.json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async GetBudgetUtilization(req, res, next) {
-    try {
-      const userId = req.user.id;
-
-      const data = await reportService.GetBudgetUtilization(userId);
-      res.json(data);
-    } catch (error) {
-      next(error);
-    }
-  }
+  GetBudgetUtilization = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const data = await reportService.GetBudgetUtilization(userId);
+    return res.json(data);
+  });
 }
 
 module.exports = new ReportController();

@@ -1,59 +1,69 @@
+const authRepository = require('./auth.repository');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const prisma = require('../../shared/database/prisma');
 const ApiError = require('../../shared/utils/ApiError');
 
 class AuthService {
   async register(email, password, name) {
-    const candidate = await prisma.user.findUnique({ where: { email } });
+    const candidate = await authRepository.findByEmail(email);
     if (candidate) {
-      throw ApiError.BadRequest(`User with email ${email} already exists`);
+      throw ApiError.BadRequest('Користувач з такою електронною поштою вже зареєстрований');
     }
-    const hashPassword = await bcrypt.hash(password, 3);
-    const user = await prisma.user.create({
-      data: { email, password: hashPassword, name },
-    });
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const user = await authRepository.createUser(email, hashPassword, name);
 
     const tokens = this.generateTokens({ id: user.id, email: user.email });
-    return { ...tokens, user: { id: user.id, email: user.email, name: user.name } };
+    return {
+      ...tokens,
+      user: { id: user.id, email: user.email, name: user.name },
+    };
   }
 
   async login(email, password) {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await authRepository.findByEmail(email);
     if (!user) {
-      throw ApiError.BadRequest('User with this email not found');
+      throw ApiError.BadRequest('Користувача з таким email не знайдено або пароль невірний');
     }
+
     const isPassEquals = await bcrypt.compare(password, user.password);
     if (!isPassEquals) {
-      throw ApiError.BadRequest('Invalid password');
+      throw ApiError.BadRequest('Користувача з таким email не знайдено або пароль невірний');
     }
 
     const tokens = this.generateTokens({ id: user.id, email: user.email });
-    return { ...tokens, user: { id: user.id, email: user.email, name: user.name } };
+    return {
+      ...tokens,
+      user: { id: user.id, email: user.email, name: user.name },
+    };
   }
 
   async refresh(refreshToken) {
     if (!refreshToken) {
-      throw ApiError.Unauthorized();
-    }
-    const userData = this.validateRefreshToken(refreshToken);
-    if (!userData) {
-      throw ApiError.Unauthorized();
+      throw ApiError.Unauthorized('Відсутній токен оновлення сесії');
     }
 
-    const user = await prisma.user.findUnique({ where: { id: userData.id } });
+    const userData = this.validateRefreshToken(refreshToken);
+    if (!userData) {
+      throw ApiError.Unauthorized('Сесія застаріла або недійсна');
+    }
+
+    const user = await authRepository.findById(userData.id);
     if (!user) {
-      throw ApiError.Unauthorized();
+      throw ApiError.Unauthorized('Користувача не знайдено');
     }
 
     const tokens = this.generateTokens({ id: user.id, email: user.email });
-    return { ...tokens, user: { id: user.id, email: user.email, name: user.name } };
+    return {
+      ...tokens,
+      user: { id: user.id, email: user.email, name: user.name },
+    };
   }
 
   async getUserData(userId) {
-    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const user = await authRepository.findById(userId);
     if (!user) {
-      throw ApiError.NotFound('User not found');
+      throw ApiError.NotFound('Профіль користувача не знайдено');
     }
     return { id: user.id, email: user.email, name: user.name };
   }

@@ -1,87 +1,64 @@
 const transactionService = require('./transaction.service');
+const catchAsync = require('../../shared/utils/catchAsync');
 
 class TransactionController {
-  async GetAll(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { page = 1, limit = 20, type, categoryId, startDate, endDate, search } = req.query;
-      const result = await transactionService.GetAll(userId, page, limit, {
-        type,
-        categoryId,
-        startDate,
-        endDate,
-        search,
-      });
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
+  GetAll = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const { page = 1, limit = 20, type, categoryId, startDate, endDate, search } = req.query;
+    const result = await transactionService.GetAll(userId, page, limit, {
+      type,
+      categoryId,
+      startDate,
+      endDate,
+      search,
+    });
+    return res.json(result);
+  });
 
-  async GetByCategory(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const categoryId = req.params.id;
-      const { page = 1, limit = 20, type, startDate, endDate, search } = req.query;
-      const result = await transactionService.GetByCategory(categoryId, userId, page, limit, {
-        type,
-        startDate,
-        endDate,
-        search,
-      });
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
+  GetByCategory = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const categoryId = req.params.id;
+    const { page = 1, limit = 20, type, startDate, endDate, search } = req.query;
+    const result = await transactionService.GetByCategory(categoryId, userId, page, limit, {
+      type,
+      startDate,
+      endDate,
+      search,
+    });
+    return res.json(result);
+  });
 
-  async GetById(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const transaction = await transactionService.GetById(req.params.id, userId);
-      res.json(transaction);
-    } catch (error) {
-      next(error);
-    }
-  }
+  GetById = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const transaction = await transactionService.GetById(req.params.id, userId);
+    return res.json(transaction);
+  });
 
-  async Create(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const { categoryId, amount, type, date, description } = req.body;
-      const transaction = await transactionService.Create(
-        userId,
-        categoryId,
-        amount,
-        type,
-        date,
-        description
-      );
-      res.status(201).json(transaction);
-    } catch (error) {
-      next(error);
-    }
-  }
+  Create = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const { categoryId, amount, type, date, description } = req.body;
+    const transaction = await transactionService.Create(
+      userId,
+      categoryId,
+      amount,
+      type,
+      date,
+      description
+    );
+    return res.status(201).json(transaction);
+  });
 
-  async Update(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const updated = await transactionService.Update(req.params.id, userId, req.body);
-      res.json(updated);
-    } catch (error) {
-      next(error);
-    }
-  }
+  Update = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const updated = await transactionService.Update(req.params.id, userId, req.body);
+    return res.json(updated);
+  });
 
-  async Delete(req, res, next) {
-    try {
-      const userId = req.user.id;
-      const result = await transactionService.Delete(req.params.id, userId);
-      res.json(result);
-    } catch (error) {
-      next(error);
-    }
-  }
+  Delete = catchAsync(async (req, res, next) => {
+    const userId = req.user.id;
+    const result = await transactionService.Delete(req.params.id, userId);
+    return res.json(result);
+  });
 }
 
 module.exports = new TransactionController();
