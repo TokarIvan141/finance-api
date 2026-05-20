@@ -401,7 +401,7 @@ const swaggerDocument = {
             '/api/v1/categories/{id}/transactions': {
               get: {
                 summary: 'Get transactions by category with filters',
-                tags: ['Categories', 'Transactions'],
+                tags: ['Transactions'],
                 parameters: [
                   {
                     in: 'path',

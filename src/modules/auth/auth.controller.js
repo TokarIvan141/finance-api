@@ -7,38 +7,26 @@ class AuthController {
   register = catchAsync(async (req, res, _next) => {
     let { email, password, name } = req.body;
 
-    if (!email || !password || !name) {
-      throw ApiError.BadRequest('Усі поля (email, password, name) є обов’язковими для заповнення');
-    }
-
-    email = email.trim().toLowerCase();
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email)) {
-      throw ApiError.BadRequest('Некоректний формат електронної пошти');
-    }
-
-    validateEmailDomain(email);
-
-    if (password.length < 8) {
-      throw ApiError.BadRequest('Пароль має бути не менше 8 символів');
-    }
-
-    if (!/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-      throw ApiError.BadRequest('Пароль має містити хоча б одну велику літеру та одну цифру');
-    }
-
-    const userData = await authService.register(email, password, name);
-    res.cookie('refreshToken', userData.refreshToken, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
+        const userData = await authService.register(email, password, name);
+        res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
+        return res.json({
+            user: userData.user,
+            accessToken: userData.accessToken
+        });
     });
-    res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
-    return res.json({
-      user: userData.user,
-      accessToken: userData.accessToken,
+
+    login = catchAsync(async (req, res, next) => {
+        const { email, password } = req.body;
+
+        const userData = await authService.login(email, password);
+        res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
+        res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
+        return res.json({
+            user: userData.user,
+            accessToken: userData.accessToken
+        });
     });
-  });
 
   login = catchAsync(async (req, res, _next) => {
     const { email, password } = req.body;
