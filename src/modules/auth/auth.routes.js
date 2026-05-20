@@ -4,11 +4,14 @@ const AuthController = require('./auth.controller');
 const authMiddleware = require('../../api/middlewares/auth.middleware');
 const auditLog = require('../../api/middlewares/audit.middleware');
 
-router.post('/register', auditLog('REGISTER'), AuthController.register);
-router.post('/login', auditLog('LOGIN'), AuthController.login);
+const validate = require('../../api/middlewares/validate.middleware');
+const { register, login } = require('../../shared/validations/auth.validation');
+
+router.post('/register', validate(register), AuthController.register);
+router.post('/login', validate(login), AuthController.login);
+
 router.post('/refresh', AuthController.refresh);
 router.post('/logout', AuthController.logout);
-
 router.get('/me', authMiddleware, AuthController.me);
 
 module.exports = router;
