@@ -1,19 +1,24 @@
 const authService = require('./auth.service');
 const catchAsync = require('../../shared/utils/catchAsync');
 const ApiError = require('../../shared/utils/ApiError');
+const validateEmailDomain = require('../../shared/utils/validateEmail');
 
 class AuthController {
-  register = catchAsync(async (req, res, next) => {
-    const { email, password, name } = req.body;
+  register = catchAsync(async (req, res, _next) => {
+    let { email, password, name } = req.body;
 
     if (!email || !password || !name) {
       throw ApiError.BadRequest('Усі поля (email, password, name) є обов’язковими для заповнення');
     }
 
+    email = email.trim().toLowerCase();
+
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(email)) {
       throw ApiError.BadRequest('Некоректний формат електронної пошти');
     }
+
+    validateEmailDomain(email);
 
     if (password.length < 8) {
       throw ApiError.BadRequest('Пароль має бути не менше 8 символів');
@@ -35,7 +40,7 @@ class AuthController {
     });
   });
 
-  login = catchAsync(async (req, res, next) => {
+  login = catchAsync(async (req, res, _next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -54,13 +59,13 @@ class AuthController {
     });
   });
 
-  logout = catchAsync(async (req, res, next) => {
+  logout = catchAsync(async (req, res, _next) => {
     res.clearCookie('refreshToken');
     res.clearCookie('accessToken');
     return res.status(200).json({ message: 'Logged out successfully' });
   });
 
-  refresh = catchAsync(async (req, res, next) => {
+  refresh = catchAsync(async (req, res, _next) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
       throw ApiError.Unauthorized('Відсутній токен оновлення сесії');
@@ -77,7 +82,7 @@ class AuthController {
     });
   });
 
-  me = catchAsync(async (req, res, next) => {
+  me = catchAsync(async (req, res, _next) => {
     const userData = await authService.getUserData(req.user.id);
     return res.json(userData);
   });

@@ -8,4 +8,5 @@ module.exports = {
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  reporters: [['default', { summaryThreshold: 1 }]],
 };

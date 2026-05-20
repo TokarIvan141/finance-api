@@ -5,13 +5,14 @@ const ApiError = require('../../shared/utils/ApiError');
 
 class AuthService {
   async register(email, password, name) {
-    const candidate = await authRepository.findByEmail(email);
+    const normalizedEmail = email.trim().toLowerCase();
+    const candidate = await authRepository.findByEmail(normalizedEmail);
     if (candidate) {
       throw ApiError.BadRequest('Користувач з такою електронною поштою вже зареєстрований');
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
-    const user = await authRepository.createUser(email, hashPassword, name);
+    const user = await authRepository.createUser(normalizedEmail, hashPassword, name);
 
     const tokens = this.generateTokens({ id: user.id, email: user.email });
     return {
@@ -21,7 +22,8 @@ class AuthService {
   }
 
   async login(email, password) {
-    const user = await authRepository.findByEmail(email);
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await authRepository.findByEmail(normalizedEmail);
     if (!user) {
       throw ApiError.BadRequest('Користувача з таким email не знайдено або пароль невірний');
     }

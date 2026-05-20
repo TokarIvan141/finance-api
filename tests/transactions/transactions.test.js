@@ -9,7 +9,7 @@ describe('Transactions Module Integration Tests', () => {
 
   const testUser = {
     email: 'trans-test@example.com',
-    password: 'password123',
+    password: 'Password123',
     name: 'Trans Tester',
   };
 
@@ -63,6 +63,56 @@ describe('Transactions Module Integration Tests', () => {
       expect(res.body).toHaveProperty('meta');
       expect(res.body.data.length).toBeGreaterThan(0);
     });
+
+    it('should filter transactions by date', async () => {
+      const res = await request(app)
+        .get('/api/v1/transactions?startDate=2026-01-01&endDate=2026-12-31')
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      expect(res.statusCode).toEqual(200);
+      expect(Array.isArray(res.body.data)).toBe(true);
+    });
+
+    it('should filter transactions by category', async () => {
+      const res = await request(app)
+        .get(`/api/v1/transactions/categories/${categoryId}`)
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      expect(res.statusCode).toEqual(200);
+      expect(Array.isArray(res.body.data)).toBe(true);
+    });
+  });
+
+  describe('PUT /api/v1/transactions/:id', () => {
+    it('should update a transaction', async () => {
+      const listRes = await request(app)
+        .get('/api/v1/transactions')
+        .set('Cookie', [`accessToken=${accessToken}`]);
+      const transId = listRes.body.data[0].id;
+
+      const res = await request(app)
+        .put(`/api/v1/transactions/${transId}`)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ amount: 2000 });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.amount.toString()).toEqual('2000');
+    });
+  });
+
+  describe('DELETE /api/v1/transactions/:id', () => {
+    it('should soft delete a transaction', async () => {
+      const listRes = await request(app)
+        .get('/api/v1/transactions')
+        .set('Cookie', [`accessToken=${accessToken}`]);
+      const transId = listRes.body.data[0].id;
+
+      const res = await request(app)
+        .delete(`/api/v1/transactions/${transId}`)
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      expect(res.statusCode).toEqual(200);
+    });
   });
 
   describe('Security Check: Accessing other user data', () => {
@@ -70,7 +120,7 @@ describe('Transactions Module Integration Tests', () => {
     beforeAll(async () => {
       const otherRes = await request(app).post('/api/v1/auth/register').send({
         email: 'other@example.com',
-        password: 'password123',
+        password: 'Password123',
         name: 'Other User',
       });
       otherToken = otherRes.body.accessToken;
@@ -89,6 +139,37 @@ describe('Transactions Module Integration Tests', () => {
         .set('Cookie', [`accessToken=${otherToken}`]);
 
       expect(res.statusCode).toEqual(404);
+    });
+  });
+
+  describe('Budget Limit Logic', () => {
+    it('should allow transaction even if budget is exceeded (per current logic)', async () => {
+      // 1. Create a category
+      const catRes = await request(app)
+        .post('/api/v1/categories')
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ name: 'Limited', type: 'expense' });
+      const catId = catRes.body.id;
+
+      // 2. Set a tiny budget
+      await request(app)
+        .post(`/api/v1/budgets/${catId}/budget`)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ amountLimit: 10 });
+
+      // 3. Create a huge transaction
+      const res = await request(app)
+        .post('/api/v1/transactions')
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({
+          categoryId: catId,
+          amount: 100,
+          type: 'expense',
+          date: '2026-05-20',
+        });
+
+      expect(res.statusCode).toEqual(400);
+      expect(res.body.message).toContain('limit exceeded');
     });
   });
 });

@@ -9,7 +9,7 @@ describe('Budgets Module Integration Tests', () => {
 
   const testUser = {
     email: 'budget-test@example.com',
-    password: 'password123',
+    password: 'Password123',
     name: 'Budget Tester',
   };
 
@@ -31,12 +31,12 @@ describe('Budgets Module Integration Tests', () => {
     await prisma.$disconnect();
   });
 
-  describe('POST /api/v1/categories/:id/budget', () => {
+  describe('POST /api/v1/budgets/:id/budget', () => {
     it('should create a budget for a category', async () => {
       const budgetData = { amountLimit: 500 };
 
       const res = await request(app)
-        .post(`/api/v1/categories/${categoryId}/budget`)
+        .post(`/api/v1/budgets/${categoryId}/budget`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .send(budgetData);
 
@@ -46,7 +46,7 @@ describe('Budgets Module Integration Tests', () => {
 
     it('should fail if budget already exists', async () => {
       const res = await request(app)
-        .post(`/api/v1/categories/${categoryId}/budget`)
+        .post(`/api/v1/budgets/${categoryId}/budget`)
         .set('Cookie', [`accessToken=${accessToken}`])
         .send({ amountLimit: 1000 });
 
@@ -58,11 +58,31 @@ describe('Budgets Module Integration Tests', () => {
   describe('GET /api/v1/categories/:id/budget', () => {
     it('should return budget for a category', async () => {
       const res = await request(app)
-        .get(`/api/v1/categories/${categoryId}/budget`)
+        .get(`/api/v1/budgets/${categoryId}/budget`)
         .set('Cookie', [`accessToken=${accessToken}`]);
 
       expect(res.statusCode).toEqual(200);
       expect(res.body.amountLimit.toString()).toEqual('500');
+    });
+  });
+
+  describe('PATCH/DELETE /api/v1/budgets/:id/budget', () => {
+    it('should update an existing budget', async () => {
+      const res = await request(app)
+        .put(`/api/v1/budgets/${categoryId}/budget`)
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ amountLimit: 750 });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.amountLimit.toString()).toEqual('750');
+    });
+
+    it('should delete a budget', async () => {
+      const res = await request(app)
+        .delete(`/api/v1/budgets/${categoryId}/budget`)
+        .set('Cookie', [`accessToken=${accessToken}`]);
+
+      expect([200, 204]).toContain(res.statusCode);
     });
   });
 });

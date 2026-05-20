@@ -7,8 +7,8 @@ describe('Categories Module Integration Tests', () => {
   let userId;
   const testUser = {
     email: 'cat-test@example.com',
-    password: 'password123',
-    name: 'Category Tester',
+    password: 'Password123',
+    name: 'Cat Tester',
   };
 
   beforeAll(async () => {
@@ -86,6 +86,22 @@ describe('Categories Module Integration Tests', () => {
 
       const deletedCategory = await prisma.category.findUnique({ where: { id: categoryId } });
       expect(deletedCategory.deletedAt).not.toBeNull();
+    });
+
+    it('should return 404 for non-existent category', async () => {
+      const res = await request(app)
+        .get('/api/v1/categories/00000000-0000-0000-0000-000000000000')
+        .set('Cookie', [`accessToken=${accessToken}`]);
+      expect(res.statusCode).toEqual(404);
+    });
+
+    it('should fail with invalid category type', async () => {
+      const res = await request(app)
+        .post('/api/v1/categories')
+        .set('Cookie', [`accessToken=${accessToken}`])
+        .send({ name: 'Invalid', type: 'invalid-type' });
+
+      expect(res.statusCode).toEqual(400);
     });
   });
 });

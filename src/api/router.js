@@ -8,7 +8,7 @@ const transactionRoutes = require('../modules/transactions/transaction.routes');
 const reportRoutes = require('../modules/reports/report.routes');
 const exportRoutes = require('../modules/export/export.routes');
 const settingRoutes = require('../modules/settings/setting.routes');
-// const logRoutes = require('../modules/logs/log.routes');
+const logRoutes = require('../modules/logs/log.routes');
 
 const authMiddleware = require('../../src/api/middlewares/auth.middleware');
 router.use('/auth', authRoutes);
@@ -21,6 +21,6 @@ router.use('/transactions', transactionRoutes);
 router.use('/reports', reportRoutes);
 router.use('/export', exportRoutes);
 router.use('/settings', settingRoutes);
-//router.use('/', logRoutes);
+router.use('/', logRoutes);
 
 module.exports = router;

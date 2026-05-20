@@ -32,6 +32,10 @@ class TransactionService {
   }
 
   async Create(userId, categoryId, amount, type, date, description) {
+    if (amount <= 0) {
+      throw ApiError.BadRequest('Сума транзакції повинна бути більшою за нуль');
+    }
+
     if (type === 'expense') {
       const budget = await budgetRepo.GetByCategoryId(categoryId, userId);
 

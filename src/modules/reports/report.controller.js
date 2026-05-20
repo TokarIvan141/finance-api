@@ -2,7 +2,7 @@ const reportService = require('./report.service');
 const catchAsync = require('../../shared/utils/catchAsync');
 
 class ReportController {
-  GetSummary = catchAsync(async (req, res, next) => {
+  GetSummary = catchAsync(async (req, res, _next) => {
     const userId = req.user.id;
     const { startDate, endDate } = req.query;
     const summary = await reportService.GetSummary(userId, startDate, endDate);
@@ -16,14 +16,14 @@ class ReportController {
     return res.json(data);
   });
 
-  GetTrend = catchAsync(async (req, res, next) => {
+  GetTrend = catchAsync(async (req, res, _next) => {
     const userId = req.user.id;
     const { startDate, endDate, interval } = req.query;
     const data = await reportService.GetTrend(userId, startDate, endDate, interval);
     return res.json(data);
   });
 
-  GetBudgetUtilization = catchAsync(async (req, res, next) => {
+  GetBudgetUtilization = catchAsync(async (req, res, _next) => {
     const userId = req.user.id;
     const data = await reportService.GetBudgetUtilization(userId);
     return res.json(data);

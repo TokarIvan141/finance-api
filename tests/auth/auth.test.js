@@ -5,7 +5,7 @@ const prisma = require('../../src/shared/database/prisma');
 describe('Auth Module Integration Tests', () => {
   const testUser = {
     email: 'test@example.com',
-    password: 'password123',
+    password: 'Password123',
     name: 'Test User',
   };
 
@@ -42,7 +42,7 @@ describe('Auth Module Integration Tests', () => {
 
       expect(res.statusCode).toEqual(400);
       expect(res.body.success).toBe(false);
-      expect(res.body.message).toContain('already exists');
+      expect(res.body.message).toContain('вже зареєстрований');
     });
 
     it('should fail registration with missing fields', async () => {
@@ -69,21 +69,21 @@ describe('Auth Module Integration Tests', () => {
     it('should fail login with incorrect password', async () => {
       const res = await request(app).post('/api/v1/auth/login').send({
         email: testUser.email,
-        password: 'wrongpassword',
+        password: 'Wrongpassword123',
       });
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toContain('Invalid password');
+      expect(res.body.message).toContain('не знайдено або пароль невірний');
     });
 
     it('should fail login with non-existent email', async () => {
       const res = await request(app).post('/api/v1/auth/login').send({
         email: 'nonexistent@example.com',
-        password: 'password123',
+        password: 'Password123',
       });
 
       expect(res.statusCode).toEqual(400);
-      expect(res.body.message).toContain('not found');
+      expect(res.body.message).toContain('не знайдено');
     });
   });
 
@@ -122,6 +122,43 @@ describe('Auth Module Integration Tests', () => {
       const cookies = res.headers['set-cookie'].join(';');
       expect(cookies).toContain('accessToken=;');
       expect(cookies).toContain('refreshToken=;');
+    });
+  });
+
+  describe('POST /api/v1/auth/refresh', () => {
+    it('should refresh tokens using a valid refresh token', async () => {
+      const loginRes = await request(app).post('/api/v1/auth/login').send({
+        email: testUser.email,
+        password: testUser.password,
+      });
+
+      const refreshToken = loginRes.headers['set-cookie']
+        .find((c) => c.startsWith('refreshToken='))
+        .split(';')[0];
+
+      const res = await request(app).post('/api/v1/auth/refresh').set('Cookie', [refreshToken]);
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toHaveProperty('accessToken');
+    });
+
+    it('should fail refresh when token is missing', async () => {
+      const res = await request(app).post('/api/v1/auth/refresh');
+      expect(res.statusCode).toEqual(401);
+    });
+
+    it('should fail refresh with an invalid token', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', ['refreshToken=invalid-token']);
+      expect(res.statusCode).toEqual(401);
+    });
+  });
+
+  describe('Unauthorized Access', () => {
+    it('should fail /me when token is invalid', async () => {
+      const res = await request(app).get('/api/v1/auth/me').set('Cookie', ['accessToken=invalid']);
+      expect(res.statusCode).toEqual(401);
     });
   });
 });

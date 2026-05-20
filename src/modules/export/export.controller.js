@@ -2,7 +2,7 @@ const exportService = require('./export.service');
 const catchAsync = require('../../shared/utils/catchAsync');
 
 class ExportController {
-  DownloadExcel = catchAsync(async (req, res, next) => {
+  DownloadExcel = catchAsync(async (req, res, _next) => {
     const userId = req.user.id;
     const { type, categoryId, startDate, endDate, search } = req.query;
 

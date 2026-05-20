@@ -1,7 +1,9 @@
 const ApiError = require('../../shared/utils/ApiError');
 
-module.exports = (err, req, res, next) => {
-  console.error(`[ERROR] [${req.method}] ${req.url} ->`, err);
+module.exports = (err, req, res, _next) => {
+  if (process.env.NODE_ENV !== 'test' || !err.status || err.status === 500) {
+    console.error(`[ERROR] [${req.method}] ${req.url} ->`, err);
+  }
 
   if (err instanceof ApiError) {
     return res.status(err.status).json({
@@ -46,6 +48,7 @@ module.exports = (err, req, res, next) => {
 
   if (
     err.name === 'ValidationError' ||
+    err.name === 'PrismaClientValidationError' ||
     err.message.includes('Argument') ||
     err.message.includes('Invalid Date')
   ) {
