@@ -1,6 +1,6 @@
 const request = require('supertest');
-const app = require('../../src/app');
-const prisma = require('../../src/shared/database/prisma');
+const app = require('../src/app');
+const prisma = require('../src/shared/database/prisma');
 
 describe('Robustness & Edge Case Tests', () => {
   let accessToken;

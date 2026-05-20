@@ -1,11 +1,11 @@
-const budgetRepo = require('../../src/modules/budgets/budget.repository');
-const authRepo = require('../../src/modules/auth/auth.repository');
-const transactionRepo = require('../../src/modules/transactions/transaction.repository');
-const logRepo = require('../../src/modules/logs/log.repository');
-const categoryRepo = require('../../src/modules/categories/category.repository');
-const settingRepo = require('../../src/modules/settings/setting.repository');
-const logController = require('../../src/modules/logs/log.controller');
-const _prisma = require('../../src/shared/database/prisma');
+const budgetRepo = require('../src/modules/budgets/budget.repository');
+const authRepo = require('../src/modules/auth/auth.repository');
+const transactionRepo = require('../src/modules/transactions/transaction.repository');
+const logRepo = require('../src/modules/logs/log.repository');
+const categoryRepo = require('../src/modules/categories/category.repository');
+const settingRepo = require('../src/modules/settings/setting.repository');
+const logController = require('../src/modules/logs/log.controller');
+const _prisma = require('../src/shared/database/prisma');
 
 describe('Repository Completeness Tests', () => {
   it('should exercise all repository methods', async () => {
