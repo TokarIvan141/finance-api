@@ -223,7 +223,7 @@ const swaggerDocument = {
         '/api/v1/categories/{id}/transactions': {
             get: {
                 summary: 'Get transactions by category with filters',
-                tags: ['Categories', 'Transactions'],
+                tags: ['Transactions'],
                 parameters: [
                     { in: 'path', name: 'id', required: true, schema: { type: 'string', format: 'uuid' } },
                     { in: 'query', name: 'page', schema: { type: 'integer', default: 1 } },
