@@ -4,19 +4,23 @@ const ApiError = require('../../shared/utils/ApiError');
 
 class TransactionService {
     async GetAll(userId, page, limit, filters) {
-        const skip = (page - 1) * limit;
-        const take = parseInt(limit);
+        const pageNumber = parseInt(page, 10) || 1;
+        const take = parseInt(limit, 10) || 20;
+        const skip = (pageNumber - 1) * take;
+
         const transactions = await transactionRepo.GetAll(userId, skip, take, filters);
         const totalItems = await transactionRepo.CountAll(userId, filters);
-        return this._formatResponse(transactions, totalItems, page, take);
+        return this._formatResponse(transactions, totalItems, pageNumber, take);
     }
 
     async GetByCategory(categoryId, userId, page, limit, filters) {
-        const skip = (page - 1) * limit;
-        const take = parseInt(limit);
+        const pageNumber = parseInt(page, 10) || 1;
+        const take = parseInt(limit, 10) || 20;
+        const skip = (pageNumber - 1) * take;
+
         const transactions = await transactionRepo.GetByCategory(categoryId, userId, skip, take, filters);
         const totalItems = await transactionRepo.CountByCategory(categoryId, userId, filters);
-        return this._formatResponse(transactions, totalItems, page, take);
+        return this._formatResponse(transactions, totalItems, pageNumber, take);
     }
 
     async GetById(id, userId) {
@@ -28,7 +32,6 @@ class TransactionService {
     async Create(userId, categoryId, amount, type, date, description) {
         if (type === 'expense') {
             const budget = await budgetRepo.GetByCategoryId(categoryId, userId);
-
             if (budget) {
                 const alreadySpent = await transactionRepo.GetTotalSpentThisMonth(userId, categoryId);
                 const totalAfterTransaction = Number(alreadySpent) + Number(amount);
@@ -46,7 +49,7 @@ class TransactionService {
     }
 
     async Update(id, userId, updateData) {
-        const transaction = await this.GetById(id, userId);
+        await this.GetById(id, userId);
         const { description, ...coreData } = updateData;
         if (coreData.date) coreData.date = new Date(coreData.date);
         return await transactionRepo.Update(id, coreData, description);
@@ -62,7 +65,7 @@ class TransactionService {
         return {
             data,
             meta: {
-                currentPage: parseInt(page),
+                currentPage: page,
                 itemsPerPage: take,
                 totalItems,
                 totalPages: Math.ceil(totalItems / take)

@@ -1,5 +1,4 @@
 const reportRepo = require('./report.repository');
-const ApiError = require('../../shared/utils/ApiError');
 
 class ReportService {
     _getDefaultDates(startDate, endDate) {
@@ -7,7 +6,6 @@ class ReportService {
         const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
         const end = endDate ? new Date(endDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-        if (start > end) throw ApiError.BadRequest('startDate cannot be greater than endDate');
         return { start, end };
     }
 
@@ -26,7 +24,6 @@ class ReportService {
         const transactions = await reportRepo.GetTransactionsForTrend(userId, start, end);
 
         const grouped = transactions.reduce((acc, curr) => {
-           
             const dateStr = curr.date.toISOString();
             const key = interval === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
 

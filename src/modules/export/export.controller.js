@@ -6,13 +6,6 @@ class ExportController {
         const userId = req.user.id;
         const { type, categoryId, startDate, endDate, search } = req.query;
 
-        if (startDate && isNaN(Date.parse(startDate))) {
-            throw require('../../shared/utils/ApiError').BadRequest('Некоректний формат початкової дати (startDate)');
-        }
-        if (endDate && isNaN(Date.parse(endDate))) {
-            throw require('../../shared/utils/ApiError').BadRequest('Некоректний формат кінцевої дати (endDate)');
-        }
-
         const buffer = await exportService.ExportToExcel(userId, { type, categoryId, startDate, endDate, search });
         const filename = `Finance_Report_${new Date().toISOString().split('T')[0]}.xlsx`;
 

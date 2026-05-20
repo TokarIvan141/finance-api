@@ -3,11 +3,14 @@ const router = express.Router();
 const AuthController = require('./auth.controller');
 const authMiddleware = require('../../api/middlewares/auth.middleware');
 
-router.post('/register', AuthController.register);
-router.post('/login', AuthController.login);
+const validate = require('../../api/middlewares/validate.middleware');
+const { register, login } = require('../../shared/validations/auth.validation');
+
+router.post('/register', validate(register), AuthController.register);
+router.post('/login', validate(login), AuthController.login);
+
 router.post('/refresh', AuthController.refresh);
 router.post('/logout', AuthController.logout);
-
 router.get('/me', authMiddleware, AuthController.me);
 
 module.exports = router;
