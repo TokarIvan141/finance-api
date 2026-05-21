@@ -5,9 +5,9 @@ class SettingService {
     return await settingRepo.GetSettings(userId);
   }
 
-    async UpdateTheme(userId, theme) {
-        return await settingRepo.UpdateTheme(userId, theme);
-    }
+  async UpdateTheme(userId, theme) {
+    return await settingRepo.UpdateTheme(userId, theme);
+  }
 }
 
 module.exports = new SettingService();

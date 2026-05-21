@@ -7,40 +7,23 @@ class AuthController {
   register = catchAsync(async (req, res, _next) => {
     let { email, password, name } = req.body;
 
-        const userData = await authService.register(email, password, name);
-        res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-        res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
-        return res.json({
-            user: userData.user,
-            accessToken: userData.accessToken
-        });
-    });
+    email = email.trim().toLowerCase();
+    validateEmailDomain(email);
 
-    login = catchAsync(async (req, res, next) => {
-        const { email, password } = req.body;
+    const userData = await authService.register(email, password, name);
+    this._setAuthCookies(res, userData);
 
-        const userData = await authService.login(email, password);
-        res.cookie('refreshToken', userData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
-        res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
-        return res.json({
-            user: userData.user,
-            accessToken: userData.accessToken
-        });
+    return res.json({
+      user: userData.user,
+      accessToken: userData.accessToken,
     });
+  });
 
   login = catchAsync(async (req, res, _next) => {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      throw ApiError.BadRequest('Поля email та password є обов’язковими');
-    }
-
     const userData = await authService.login(email, password);
-    res.cookie('refreshToken', userData.refreshToken, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
+    this._setAuthCookies(res, userData);
+
     return res.json({
       user: userData.user,
       accessToken: userData.accessToken,
@@ -56,14 +39,12 @@ class AuthController {
   refresh = catchAsync(async (req, res, _next) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      throw ApiError.Unauthorized('Відсутній токен оновлення сесії');
+      throw ApiError.Unauthorized('Refresh token is missing');
     }
+
     const userData = await authService.refresh(refreshToken);
-    res.cookie('refreshToken', userData.refreshToken, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-    });
-    res.cookie('accessToken', userData.accessToken, { maxAge: 15 * 60 * 1000, httpOnly: true });
+    this._setAuthCookies(res, userData);
+
     return res.json({
       user: userData.user,
       accessToken: userData.accessToken,
@@ -74,6 +55,17 @@ class AuthController {
     const userData = await authService.getUserData(req.user.id);
     return res.json(userData);
   });
+
+  _setAuthCookies(res, userData) {
+    res.cookie('refreshToken', userData.refreshToken, {
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    });
+    res.cookie('accessToken', userData.accessToken, {
+      maxAge: 15 * 60 * 1000,
+      httpOnly: true,
+    });
+  }
 }
 
 module.exports = new AuthController();

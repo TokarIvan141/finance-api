@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const mongoose = require('mongoose');
 const prisma = require('../src/shared/database/prisma');
 

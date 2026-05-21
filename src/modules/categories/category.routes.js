@@ -9,7 +9,12 @@ const { uuidParam, paginationQuery } = require('../../shared/validations/common.
 router.get('/', validate(paginationQuery), CategoryController.GetAll);
 router.get('/:id', validate(uuidParam), CategoryController.GetById);
 router.post('/', validate(createCategory), auditLog('CREATE_CATEGORY'), CategoryController.Create);
-router.put('/:id', validate(updateCategory), auditLog('UPDATE_CATEGORY'), CategoryController.Update);
+router.put(
+  '/:id',
+  validate(updateCategory),
+  auditLog('UPDATE_CATEGORY'),
+  CategoryController.Update
+);
 router.delete('/:id', validate(uuidParam), auditLog('DELETE_CATEGORY'), CategoryController.Delete);
 
 module.exports = router;

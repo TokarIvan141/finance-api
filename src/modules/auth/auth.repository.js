@@ -14,20 +14,6 @@ class AuthRepository {
       data: { email, password, name },
     });
   }
-
-  async saveToken(userId, refreshToken) {
-    return await prisma.token.upsert({
-      where: { userId },
-      update: { refreshToken },
-      create: { userId, refreshToken },
-    });
-  }
-
-  async findToken(refreshToken) {
-    return await prisma.token.findFirst({
-      where: { refreshToken },
-    });
-  }
 }
 
 module.exports = new AuthRepository();

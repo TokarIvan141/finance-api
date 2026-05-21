@@ -1,4 +1,5 @@
 const reportRepo = require('./report.repository');
+const ApiError = require('../../shared/utils/ApiError');
 
 class ReportService {
   _getDefaultDates(startDate, endDate) {
@@ -6,14 +7,12 @@ class ReportService {
     const start = startDate ? new Date(startDate) : new Date(now.getFullYear(), now.getMonth(), 1);
     const end = endDate ? new Date(endDate) : new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-<<<<<<< HEAD
-    if (start > end) throw ApiError.BadRequest('startDate cannot be greater than endDate');
+    if (start > end) {
+      throw ApiError.BadRequest('startDate cannot be greater than endDate');
+    }
+
     return { start, end };
   }
-=======
-        return { start, end };
-    }
->>>>>>> 76f52039a5b74178a7ea2d33b82c90ea6b8f0511
 
   async GetSummary(userId, startDate, endDate) {
     const { start, end } = this._getDefaultDates(startDate, endDate);
@@ -29,15 +28,9 @@ class ReportService {
     const { start, end } = this._getDefaultDates(startDate, endDate);
     const transactions = await reportRepo.GetTransactionsForTrend(userId, start, end);
 
-<<<<<<< HEAD
     const grouped = transactions.reduce((acc, curr) => {
       const dateStr = curr.date.toISOString();
       const key = interval === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
-=======
-        const grouped = transactions.reduce((acc, curr) => {
-            const dateStr = curr.date.toISOString();
-            const key = interval === 'month' ? dateStr.substring(0, 7) : dateStr.substring(0, 10);
->>>>>>> 76f52039a5b74178a7ea2d33b82c90ea6b8f0511
 
       if (!acc[key]) {
         acc[key] = { date: key, income: 0, expense: 0 };

@@ -6,6 +6,11 @@ const validate = require('../../api/middlewares/validate.middleware');
 const { updateTheme } = require('../../shared/validations/setting.validation');
 
 router.get('/', SettingController.GetSettings);
-router.patch('/theme', validate(updateTheme), auditLog('UPDATE_THEME'), SettingController.UpdateTheme);
+router.patch(
+  '/theme',
+  validate(updateTheme),
+  auditLog('UPDATE_THEME'),
+  SettingController.UpdateTheme
+);
 
 module.exports = router;

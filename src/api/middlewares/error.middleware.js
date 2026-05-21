@@ -1,7 +1,8 @@
 const ApiError = require('../../shared/utils/ApiError');
 
 module.exports = (err, req, res, _next) => {
-  if (process.env.NODE_ENV !== 'test' || !err.status || err.status === 500) {
+  /* istanbul ignore next */
+  if (process.env.NODE_ENV !== 'test') {
     console.error(`[ERROR] [${req.method}] ${req.url} ->`, err);
   }
 

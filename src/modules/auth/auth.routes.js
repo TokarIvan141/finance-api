@@ -7,8 +7,8 @@ const auditLog = require('../../api/middlewares/audit.middleware');
 const validate = require('../../api/middlewares/validate.middleware');
 const { register, login } = require('../../shared/validations/auth.validation');
 
-router.post('/register', validate(register), AuthController.register);
-router.post('/login', validate(login), AuthController.login);
+router.post('/register', validate(register), auditLog('REGISTER'), AuthController.register);
+router.post('/login', validate(login), auditLog('LOGIN'), AuthController.login);
 
 router.post('/refresh', AuthController.refresh);
 router.post('/logout', AuthController.logout);

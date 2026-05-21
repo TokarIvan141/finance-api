@@ -7,13 +7,7 @@ class ExportService {
     const transactions = await transactionRepo.GetAll(userId, 0, 100000, filters);
 
     if (!transactions || transactions.length === 0) {
-      const hasActiveFilters =
-        filters &&
-        (filters.type ||
-          filters.categoryId ||
-          filters.startDate ||
-          filters.endDate ||
-          filters.search);
+      const hasActiveFilters = Object.values(filters || {}).some(Boolean);
 
       if (hasActiveFilters) {
         throw ApiError.NotFound(

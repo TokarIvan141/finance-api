@@ -9,6 +9,11 @@ const { uuidParam } = require('../../shared/validations/common.validation');
 router.get('/:id/budget', validate(uuidParam), BudgetController.GetByCategoryId);
 router.post('/:id/budget', validate(setBudget), auditLog('CREATE_BUDGET'), BudgetController.Create);
 router.put('/:id/budget', validate(setBudget), auditLog('UPDATE_BUDGET'), BudgetController.Update);
-router.delete('/:id/budget', validate(uuidParam), auditLog('DELETE_BUDGET'), BudgetController.Delete);
+router.delete(
+  '/:id/budget',
+  validate(uuidParam),
+  auditLog('DELETE_BUDGET'),
+  BudgetController.Delete
+);
 
 module.exports = router;

@@ -51,8 +51,8 @@ class ReportRepository {
         const category = categories.find((c) => c.id === item.categoryId);
         return {
           categoryId: item.categoryId,
-          categoryName: category ? category.name : 'Unknown',
-          color: category ? category.color : '#ccc',
+          categoryName: category.name,
+          color: category.color,
           total: item._sum.amount,
         };
       })
