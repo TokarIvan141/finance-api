@@ -4,10 +4,15 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "migrate": "prisma migrate dev --name init"
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "migrate": "prisma migrate dev --name init",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "check": "npm run lint && npm test"
   },
   "keywords": [],
   "author": "",
@@ -31,7 +36,17 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-n": "^18.0.1",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.6.0",
+    "jest": "^30.4.2",
+    "jest-summary-reporter": "^0.0.2",
     "nodemon": "^3.1.14",
-    "prisma": "^7.8.0"
+    "prettier": "^3.8.3",
+    "prisma": "^7.8.0",
+    "supertest": "^7.2.2"
   }
 }

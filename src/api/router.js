@@ -16,8 +16,8 @@ router.use('/auth', authRoutes);
 router.use(authMiddleware);
 
 router.use('/categories', categoryRoutes);
-router.use('/categories', budgetRoutes);
-router.use('/', transactionRoutes);
+router.use('/budgets', budgetRoutes);
+router.use('/transactions', transactionRoutes);
 router.use('/reports', reportRoutes);
 router.use('/export', exportRoutes);
 router.use('/settings', settingRoutes);
